@@ -1,0 +1,46 @@
+{
+  "name": "@perma-pin/lib",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf pkg && pika build && tar -zcvf lib.tgz pkg/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "arweave": "^1.6.0",
+    "cids": "0.7.1",
+    "detect-file-type": "0.2.7",
+    "ipfs-http-client": "40.0.0",
+    "promises-tho": "1.1.0"
+  },
+  "@pika/pack": {
+    "pipeline": [
+      [
+        "@pika/plugin-ts-standard-pkg"
+      ],
+      [
+        "@pika/plugin-build-node"
+      ],
+      [
+        "@pika/plugin-build-web"
+      ],
+      [
+        "@pika/plugin-build-deno"
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@pika/pack": "0.5.0",
+    "@pika/plugin-build-deno": "0.6.1",
+    "@pika/plugin-build-node": "0.6.1",
+    "@pika/plugin-build-web": "0.6.1",
+    "@pika/plugin-ts-standard-pkg": "0.6.1",
+    "@pika/types": "0.6.1",
+    "jsdoc-to-markdown": "5.0.3",
+    "typescript": "3.7.2"
+  }
+}
