@@ -85,7 +85,7 @@ result.alreadyPinned // set to true if the file was already uploaded to Arweave
 
 ```
 
-### Permafiy Multiple IPFS hashes/ 
+### Permafiy Multiple IPFS hashes 
 
 ```typescript
 
