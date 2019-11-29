@@ -65,6 +65,7 @@ export interface PermafiyErrorResult {
   error: string 
 }
 
+
 /**
  * Permaify a new file to both Arweave and IPFS. 
  * 
@@ -83,9 +84,14 @@ export async function permafiyFile(data: Buffer | Uint8Array, contentType?: stri
     throw new Error(`Unexpected response putting file to ipfs: ${cid}`);
   }
 
-  
+  // Check if its aleady on Arweave.
+  const existing = await findIpfsFileOnArweave(cid);
+  if (existing) {
+    return { ok: true, hash: cid, id: existing, alreadyPinned: true };
+  }
+
   const res = await putArweaveFile(cid, data, contentType);
-  return res as any; //todo: fix
+  return res
 }
 
 
@@ -145,16 +151,50 @@ export async function permaifyManyExisting(cids: string[]): Promise<(PermafiySuc
   // Batch in sizes of 10s
   const batcher = batch({ batchSize: 10, batchDelayMs: 30 }, op);
   return batcher(cids);
-
 }
 
+/**
+ * Checks for a pending TX. 
+ * 
+ * You should use this method to check whether a pending TX has
+ * been mined. On some occasions, to catch block propogation, 
+ * this method may take a long time to return (around 80 seconds) 
+ * 
+ * @param {string} txId 
+ * @return {Promise<number>} status code, one of 200 (mined), 202 (pending) or 404 (not found) 
+ */
+export async function checkForPending(txId: string): Promise<number> {
+  let result = await arweave.transactions.getStatus(txId);
+  if (result.status === 404) {
+    // Not perfect but will hopefully catch *most* block propogation delays.
+    await new Promise(res => setTimeout(res, 1000*80));
+    result = await arweave.transactions.getStatus(txId); 
+  }
+  return result.status;
+}
+
+/**
+ * Gets the balance for the loaded wallet in AR.
+ */
+export async function checkWalletBlance(): Promise<number> {
+  return arweave.wallets.jwkToAddress(arweaveKey)
+    .then(addr => arweave.wallets.getBalance(addr))
+    .then(winston => arweave.ar.winstonToAr(winston))
+    .then(ar => parseFloat(ar));
+}
+
+/**
+ * Gets the public address of the loaded wallet.
+ */
+export async function getWalletPublicAddress(): Promise<string> {
+  return arweave.wallets.jwkToAddress(arweaveKey);
+}
 
 /**
  * Attempts to detect a mime type from a Buffer or Uint8Array. 
- * Promise returning function.
  * 
- * @param data Buffer containing bytes
- * @returns a promise of object like { mime: 'image/png' } or null 
+ * @param {Buffer | Uint8Array} data Buffer containing bytes
+ * @returns {Promise<FileType>}
  * 
  */
 export const detectFileTypeFromBuffer: (data: Buffer | Uint8Array) => Promise<FileType> 
@@ -185,7 +225,7 @@ export function parseCid(cid: string): false | object {
  */
 export async function getIpfsFileSimple(path: string): Promise<{ data: Buffer, fileType: FileType } | undefined> {
   try { 
-    const data = await ipfs.cat(path, { timeout: 1000*50 });
+    const data = await ipfs.cat(path);
     const fileType = await detectFileTypeFromBuffer(data);
     return {
       data,
