@@ -23,14 +23,14 @@ Published on Arweave Blockchain:
 
 ### Related To
 
-- [https://github.com/aokis/perma-pin-http/](https://github.com/aokis/perma-pin-http/)
-- [https://github.com/aokis/perma-pin-ui/](https://github.com/aokis/perma-pin-ui/)
+- [https://github.com/aokisok/perma-pin-http/](https://github.com/aokisok/perma-pin-http/)
+- [https://github.com/aokisok/perma-pin-ui/](https://github.com/aokisok/perma-pin-ui/)
 
 This library is perfectly suitable for use in your NodeJs/TypeScript/Browser project directly. 
 
 There is Public API & Service @ 
 
-[https://perma-pin.bloc.space](https://perma-pin.bloc.space)
+- [https://perma-pin.bloc.space](https://perma-pin.bloc.space)
 
 ### Wallet setup
 
