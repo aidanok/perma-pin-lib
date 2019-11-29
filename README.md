@@ -4,8 +4,8 @@ Perma-Pin library
 
 Library to upload & pin ipfs content to the Arweave blockchain. 
 
-- Api to upload new files to both IPFS and Arweave at the same.
-- Api to permafiy files already on IPFS by uploading them to Arweave. 
+- API to upload new files to both IPFS and Arweave at the same.
+- API to permafiy files already on IPFS by uploading them to Arweave. 
 - Detects when a file has already been uploaded to Arweave and does not re-upload
 - Verifies the content stored in Arweave is the same content as on IPFS before deciding not to upload to Arweave. 
 - Detects content type of files on IPFS to add a Content-Type tag the Arweave transaction. 
@@ -42,6 +42,29 @@ export AR_WALLET_JSON=$(cat /path/to/mywallet.json)
 
 ## Quick Examples  
 
+
+### Permafiy New Content to IPFS & Arweave 
+
+```typescript
+
+import { permafiyFile } from '@perma-ipfs/lib' 
+
+// ... later, in an async function.
+// ... content type is optional. 
+
+const result =  await permafiyFile(myFileBuffer, 'image/png');
+
+result.id // arweave tx id 
+result.hash // ipfs cid (same as passed in) 
+result.alreadyPinned // set to true if the file was already uploaded to Arweave
+
+
+// You can obtain the content-type however you want, there is a helper function 
+// included to detect it from a Buffer or Uint8Array of bytes. `
+
+```
+
+
 ### Permafiy Existing Content
 
 ```typescript
@@ -54,6 +77,7 @@ const result = await permafiyExisting(cid);
 
 result.id // arweave tx id 
 result.hash // ipfs cid (same as passed in) 
+result.alreadyPinned // set to true if the file was already uploaded to Arweave
 
 
 // Using this method will attempt to detect the mime type of the file and set the approriate Content-Type
@@ -61,22 +85,19 @@ result.hash // ipfs cid (same as passed in)
 
 ```
 
-### Permafiy New Content
+### Permafiy Multiple IPFS hashes/ 
 
 ```typescript
 
-import { putIpfsFile, putArweaveFile } from '@perma-ipfs/lib' 
+import { permaifyManyExisting } from '@perma-ipfs/lib' 
 
-// ... later, in an async function.
-const ipfsResult = await putIpfsFile(myFileBuffer);
-const cid = ipfsResult[0].hash; 
-const result =  await putArweaveFile(cid, myFileBuffer, { mime: 'image/png' } );
+// ... later, in an async function 
+const cids: string[] = []; // lots and lots of IPFS Hashes. 
+const result = await permafiyExisting(cid);
 
-result.id // arweave tx id 
-result.hash // ipfs cid (same as passed in) 
+// Using this method will permafiy many IPFS hashes in batches of 10, eventually
+// giving you back an array of objects in the same format as other the above API methods. 
 
-// You can obtain the mimetype however you want, there is a helper function 
-// included to detect it from a Buffer or Uint8Array of bytes. `
 
 ```
 
