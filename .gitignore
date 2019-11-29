@@ -2,4 +2,6 @@ dist
 node_modules
 pkg
 lib.tgz
+qt.ts
+
 
